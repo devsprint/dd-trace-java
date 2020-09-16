@@ -5,7 +5,7 @@ import reactor.core.publisher.Mono
 import java.util.concurrent.CountDownLatch
 
 import static datadog.trace.agent.test.utils.TraceUtils.basicSpan
-import static datadog.trace.agent.test.utils.TraceUtils.runUnderTrace;
+import static datadog.trace.agent.test.utils.TraceUtils.runUnderTrace
 
 class SubscriptionTest extends AgentTestRunner {
 

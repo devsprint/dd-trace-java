@@ -190,11 +190,9 @@ class SpringWebfluxTest extends AgentTestRunner {
     where:
     testName                                  | urlPath                       | urlPathWithVariables             | annotatedMethod       | expectedResponseBody
     "functional API traced method from mono"  | "/greet-mono-from-callable/4" | "/greet-mono-from-callable/{id}" | null                  | SpringWebFluxTestApplication.GreetingHandler.DEFAULT_RESPONSE + " 4"
-    "functional API traced method"            | "/greet-traced-method/5"      | "/greet-traced-method/{id}"      | null                  | SpringWebFluxTestApplication.GreetingHandler.DEFAULT_RESPONSE + " 5"
     "functional API traced method with delay" | "/greet-delayed-mono/6"       | "/greet-delayed-mono/{id}"       | null                  | SpringWebFluxTestApplication.GreetingHandler.DEFAULT_RESPONSE + " 6"
 
     "annotation API traced method from mono"  | "/foo-mono-from-callable/7"   | "/foo-mono-from-callable/{id}"   | "getMonoFromCallable" | new FooModel(7L, "tracedMethod").toString()
-    "annotation API traced method"            | "/foo-traced-method/8"        | "/foo-traced-method/{id}"        | "getTracedMethod"     | new FooModel(8L, "tracedMethod").toString()
     "annotation API traced method with delay" | "/foo-delayed-mono/9"         | "/foo-delayed-mono/{id}"         | "getFooDelayedMono"   | new FooModel(9L, "tracedMethod").toString()
   }
 
