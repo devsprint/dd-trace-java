@@ -1,7 +1,5 @@
 package datadog.trace.instrumentation.reactor.core;
 
-import static datadog.trace.bootstrap.instrumentation.api.AgentTracer.activateSpan;
-
 import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
 import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
 import datadog.trace.context.TraceScope;
@@ -18,6 +16,7 @@ public class TracingSubscriber<T> implements CoreSubscriber<T> {
   private final Subscriber<? super T> subscriber;
   private final Context context;
   private final AgentSpan span;
+  private TraceScope.Continuation continuation;
 
   public TracingSubscriber(final Subscriber<? super T> subscriber, final Context context) {
     this(subscriber, context, AgentTracer.activeSpan());
@@ -28,6 +27,11 @@ public class TracingSubscriber<T> implements CoreSubscriber<T> {
     this.subscriber = subscriber;
     this.context = context;
     this.span = span;
+    if (span != null) {
+      try (final TraceScope scope = AgentTracer.activateSpan(span)) {
+        continuation = scope.capture();
+      }
+    }
   }
 
   @Override
@@ -43,11 +47,19 @@ public class TracingSubscriber<T> implements CoreSubscriber<T> {
   @Override
   public void onError(final Throwable throwable) {
     withActiveSpan(() -> subscriber.onError(throwable));
+    if (continuation != null) {
+      continuation.cancel();
+      continuation = null;
+    }
   }
 
   @Override
   public void onComplete() {
     withActiveSpan(subscriber::onComplete);
+    if (continuation != null) {
+      continuation.cancel();
+      continuation = null;
+    }
   }
 
   @Override
@@ -57,7 +69,8 @@ public class TracingSubscriber<T> implements CoreSubscriber<T> {
 
   private void withActiveSpan(final Runnable runnable) {
     if (span != null) {
-      try (final TraceScope ignored = activateSpan(span)) {
+      try (final TraceScope scope = AgentTracer.activateSpan(span)) {
+        scope.setAsyncPropagation(true);
         runnable.run();
       }
     } else {
