@@ -1,12 +1,12 @@
 import datadog.trace.instrumentation.reactor.core.TracingOperator
 import datadog.trace.instrumentation.reactor.core.TracingSubscriber
+import datadog.trace.util.test.DDSpecification
 import reactor.core.CoreSubscriber
 import reactor.core.publisher.Mono
-import spock.lang.Specification
 
 import java.util.concurrent.atomic.AtomicReference
 
-class HooksTest extends Specification {
+class HooksTest extends DDSpecification {
 
   def "can reset our hooks"() {
     setup:
